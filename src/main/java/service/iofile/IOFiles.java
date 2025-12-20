@@ -3,15 +3,26 @@ package service.iofile;
 import base.Element;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 public class IOFiles {
-    public static void writeFile(String fileName, String content) {
-
+    public static void writeFile(String filePath, List<String> elements, StandardOpenOption ...options) {
+        try {
+            Path path = Paths.get(filePath);
+            Files.write(path, elements, options);
+        }
+        catch (Exception e) {
+            System.out.println("Ошибка при записи файла:");
+            e.printStackTrace();
+        }
     }
 
     public static void readFile(String filePath, List<Element> inputElement) {
