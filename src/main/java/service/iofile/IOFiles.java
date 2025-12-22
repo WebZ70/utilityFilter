@@ -1,12 +1,11 @@
 package service.iofile;
 
 import base.Element;
+import base.Elements;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,7 +13,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 public class IOFiles {
-    public static void writeFile(String filePath, List<String> elements, StandardOpenOption ...options) {
+    public static boolean writeFile(String filePath, List<String> elements, StandardOpenOption ...options) {
         try {
             Path path = Paths.get(filePath);
             Files.write(path, elements, options);
@@ -23,9 +22,10 @@ public class IOFiles {
             System.out.println("Ошибка при записи файла:");
             e.printStackTrace();
         }
+        return true;
     }
 
-    public static void readFile(String filePath, List<Element> inputElement) {
+    public static void readFile(String filePath, Elements element) {
         String line;
 
         if (!Files.exists(Paths.get(filePath))) {
@@ -35,7 +35,8 @@ public class IOFiles {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             while ((line = reader.readLine()) != null) {
-                inputElement.add(new Element(line));
+                if (line.isBlank()) continue;
+                element.addElement(new Element(line));
             }
 
         } catch (IOException e) {

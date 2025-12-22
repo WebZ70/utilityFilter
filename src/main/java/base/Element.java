@@ -1,34 +1,23 @@
 package base;
 
-import service.parsing.Type;
 import service.parsing.recognize.Recognize;
 
+import java.util.Objects;
+
 public class Element {
-    private final Type type;
-    private final String value;
+    private final Object element;
+    private final String type;
 
-    public Element(String value) {
-        this.value = value;
-        this.type = setType();
+    public Element(String element) {
+        this.element = Recognize.parseElement(element);
+        this.type = Recognize.getType(Objects.requireNonNull(this.element));
     }
 
-    public String getValue() {
-        return value;
+    public String getElement() {
+        return element.toString();
     }
 
-    private Type setType() {
-        if (Recognize.isInteger(value)) {
-            return Type.INTEGER;
-        } else if (Recognize.isFloat(value)) {
-            return Type.FLOAT;
-        } else if (Recognize.isString(value)) {
-            return Type.STRING;
-        }
-        return Type.UNIDENTIFIED;
-    }
-
-    public Type getType() {
+    public String getType() {
         return type;
     }
-
 }
