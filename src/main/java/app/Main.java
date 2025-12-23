@@ -1,37 +1,48 @@
 package app;
 
-import base.Element;
 import base.Elements;
 import service.iofile.IOFiles;
-import service.parsing.recognize.Recognize;
 
+import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
-        List<String> nameFile = Arrays.asList("integer.txt", "float.txt", "string.txt");
-        String path = "./";
-        //Выделение памяти под будующие строки
+        //Параметры по умолчанию
+        String pref = "";
+        String pathOut = "";
+        StandardOpenOption option = StandardOpenOption.CREATE;
+        //Выделение памяти под объект
         Elements elements = new Elements();
-        //Чтение строк из файла в список Element
-        IOFiles.readFile("src/main/java/source/in/in2.txt", elements);
-        //Запись в файл в соответствии с определенным типом
-        //Названия файлов integers.txt, floats.txt, strings.txt
-//        System.out.println(elements.getElements().stream().map(Element::getElement).toList());
-        System.out.println(Arrays.stream(args).toList());
-        if (args.length != 0) {
-            for (int parm = 0, value = parm + 1; parm < args.length; parm++) {
-                switch (args[parm]) {
-                    case "-p":
-                        System.out.println("Префикс выходных файлов: " + args[++parm]);
-                        nameFile = nameFile.stream().map(m -> args[value].concat(m)).toList();
-                        break;
-                    case "-o":
-                        System.out.println("Путь до выходных файлов: " + args[++parm]);
+        System.out.println("Выполнение с параметрами: " + Arrays.stream(args).toList());
 
-                        break;
+        if (args.length != 0 && Arrays.stream(args).noneMatch(s -> s.endsWith(".txt"))) {
+            System.out.println("Входные файлы не заданы");
+            System.exit(0);
+        }
+
+        if (args.length != 0) {
+            for (int i = 0; i < args.length; i++) {
+                //Чтение строк из файла и заполнение объекта Elements
+                switch (args[i]) {
+                    case "-p":
+                        if (!args[i+1].startsWith("-")) {
+                            pref = args[++i];
+                            System.out.println("Префикс выходных файлов: " + pref);
+                            System.exit(0);
+                        }
+                        System.out.println("Пустое значение параметра '-p'");
+                        System.exit(-1);
+                    case "-o":
+                        if (!args[i+1].startsWith("-")) {
+                            pathOut = args[++i];
+                            System.out.println("Путь до выходных файлов: " + pathOut);
+                            System.exit(0);
+                        }
+                        System.out.println("Пустое значение параметра '-o'");
+                        System.exit(-1);
                     case "-a":
+                        option = StandardOpenOption.APPEND;
                         System.out.println("Режим добавления в существующий файл(по умолчанию перезаписывает)");
                         break;
                     case "-s":
@@ -39,15 +50,19 @@ public class Main {
                         break;
                     case "-f":
                         System.out.println("Полная статистика");
+                        break;
+                    default:
+                        if(args[i].endsWith(".txt")) {
+                            elements.readFromFile(args[i]);
+                        } else {
+                            System.out.println("Неопознанный параметр: " + args[i]);
+                        }
                 }
             }
         }
 
+        elements.writeToFile(pathOut, option);
 
-        //Фильтруем элементы
-        nameFile.stream().map(m ->
-            elements.getElements(m.substring(m.indexOf("_") + 1, m.lastIndexOf(".")))
-        ).forEach(System.out::println);
-//        IOFiles.writeFile(path.concat(nameFile), elements.getElements("String"));
+
     }
 }
