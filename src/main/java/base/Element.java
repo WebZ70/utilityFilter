@@ -5,7 +5,7 @@ import service.parsing.recognize.Recognize;
 import java.util.Objects;
 import java.util.Optional;
 
-public class Element {
+public class Element<T> {
     private final Object element;
     private final String type;
 
@@ -28,6 +28,11 @@ public class Element {
     public String getElement() {
         return element.toString();
     }
+
+    public Object getElementObject() {
+        return element;
+    }
+
 
     public String getType() {
         return type;

@@ -8,26 +8,67 @@ package service.statistics;
 //значения, сумма и среднее. Полная статистика для строк, помимо их количества,
 //содержит также размер самой короткой строки и самой длинной.
 
-import service.parsing.Type;
+import base.Element;
+import base.Elements;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Statistics {
-    private HashMap<Object, Integer> countElementsIn;
-    public Statistics() {
-        countElementsIn = new HashMap<>();
+    private final HashMap<String, Integer> countElements;
+    Elements elements;
+    AllStatistics allStatistics;
+    public Statistics(Elements elements) {
+        countElements = new HashMap<>();
+        this.elements = elements;
     }
 
-    public HashMap<Object, Integer> getCountElementsIn() {
-        return countElementsIn;
+    public void showSummaryStatistics() {
+        System.out.println(countElements);
     }
 
-    public void incrementCountElementsIn(Object type) {
-        if (!countElementsIn.containsKey(type)) {
-            countElementsIn.replace(type, countElementsIn.get(type), countElementsIn.get(type) + 1);
+    public void showAllStatistics() {
+        allStatistics.calcStatistics();
+    }
+
+    private void setCountElementsIn(String type, Integer count) {
+        this.countElements.put(type, count);
+    }
+
+    private void incrementCountElementsIn(String type, int count) {
+        if (countElements.containsKey(type)) {
+            countElements.replace(type, countElements.get(type), countElements.get(type) + count);
         }else {
-            System.out.println("Ключ \"" + type + "\" не найден");
+            setCountElementsIn(type, count);
         }
+    }
+
+    private void collector() {
+        //Запись краткой статистики
+        elements.uniqueTypeElements().forEach(type -> {
+            incrementCountElementsIn(type, this.elements.getElements().stream().filter(f -> f.getType().equals(type)).map(Element::getElement).toList().size());
+        });
+    }
+
+    public List<Number> getElementsNumber() {
+        return elements.getElements().stream().map(Element::getElementObject).toList()
+                .stream().filter(element -> element instanceof Number)
+                .map(element -> (Number) element).toList();
+    }
+
+    public List<String> getElementsString() {
+        return elements.getElements().stream().map(Element::getElementObject).toList()
+                .stream().filter(element -> element instanceof String)
+                .map(element -> (String) element).toList();
+    }
+
+    public void collectorAll() {
+        //Запись полной статистики
+        allStatistics = new StatisticsNumber(getElementsNumber());
+        allStatistics.calcStatistics();
+        allStatistics = new StatisticsString(getElementsString());
+        allStatistics.calcStatistics();
+
     }
 }

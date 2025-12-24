@@ -1,6 +1,5 @@
 package service.iofile;
 
-import base.Element;
 import base.Elements;
 
 import java.io.BufferedReader;
@@ -26,7 +25,7 @@ public class IOFiles {
         elements.uniqueTypeElements().forEach(name -> {
             try {
                 Path path = Paths.get(p.concat(name.concat(".txt")));
-                Files.write(path, elements.getElementsByType(name), options);
+                Files.write(path, elements.filterElementsByType(name), options);
             }catch (NoSuchFileException e){
                 System.out.println("Файл не существует: " + e.getMessage());
             }catch (IOException e) {

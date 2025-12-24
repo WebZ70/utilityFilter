@@ -1,10 +1,11 @@
 package app;
 
+import base.Element;
 import base.Elements;
-import service.iofile.IOFiles;
 
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
@@ -29,7 +30,7 @@ public class Main {
                         if (!args[i+1].startsWith("-")) {
                             pref = args[++i];
                             System.out.println("Префикс выходных файлов: " + pref);
-                            System.exit(0);
+                            break;
                         }
                         System.out.println("Пустое значение параметра '-p'");
                         System.exit(-1);
@@ -37,7 +38,7 @@ public class Main {
                         if (!args[i+1].startsWith("-")) {
                             pathOut = args[++i];
                             System.out.println("Путь до выходных файлов: " + pathOut);
-                            System.exit(0);
+                            break;
                         }
                         System.out.println("Пустое значение параметра '-o'");
                         System.exit(-1);
@@ -62,6 +63,16 @@ public class Main {
         }
 
         elements.writeToFile(pathOut, option);
+        elements.getStatistics().collectorAll();
+
+
+
+//        elements.filterElementsByTypeObject("integer").stream()
+//                .map(elements::getElementsFilteredByObject)
+//                .map(element -> element.stream()
+//                        .map(Element::getElementObject)
+//                ).forEach(System.out::println);
+
 
 
     }
