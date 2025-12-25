@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Elements {
     private final List<Element> elements;
@@ -18,24 +17,12 @@ public class Elements {
         statistics = new Statistics(this);
     }
 
-    private void addElement(Element element) {
-        elements.add(element);
+    public List<Element> getElements() {
+        return elements;
     }
 
-    public List<String> filterElementsByType(String type) {
-        return elements.stream().filter(f -> f.getType().equals(type)).map(Element::getElement).toList();
-    }
-
-    public List<Object> filterElementsByTypeObject(String type) {
-        return elements.stream().filter(f -> f.getType().equals(type)).collect(Collectors.toList());
-    }
-
-    public List<Element> getElementsFilteredByObject(Object object) {
-        return elements.stream().filter(e -> e.equals(object)).collect(Collectors.toList());
-    }
-
-    public List<String> uniqueTypeElements() {
-        return elements.stream().map(Element::getType).distinct().toList();
+    public Statistics getStatistics() {
+        return statistics;
     }
 
     public void readFromFile(String path) {
@@ -48,7 +35,7 @@ public class Elements {
             while ((line = reader.readLine()) != null) {
                 if (line.isBlank()) continue;
                 if (Element.create(line).isPresent()) {
-                    addElement(Element.create(line).get());
+                    elements.add(Element.create(line).get());
                 }
             }
         } catch (IOException e) {
@@ -57,10 +44,11 @@ public class Elements {
     }
 
     public void writeToFile(String p, StandardOpenOption ...options)  {
-        uniqueTypeElements().forEach(name -> {
+        uniqueTypeElements().forEach(type -> {
             try {
-                Path path = Paths.get(p.concat(name.concat(".txt")));
-                Files.write(path, filterElementsByType(name), options);
+                Path path = Paths.get(p.concat(type.concat(".txt")));
+                Files.write(path, filterElementsByType(type), options);
+                statistics.counter(type, filterElementsByType(type).size());
             }catch (NoSuchFileException e){
                 System.out.println("Файл не существует: " + e.getMessage());
             }catch (IOException e) {
@@ -69,26 +57,11 @@ public class Elements {
         });
     }
 
-    public List<Element> getElements() {
-        return elements;
+    public List<String> filterElementsByType(String type) {
+        return elements.stream().filter(f -> f.getType().equals(type)).map(Element::getElement).toList();
     }
 
-    public List<Object> getElementsObject(String type) {
-        return elements.stream().filter(element -> element.getType().equals(type)).map(Element::getElement).collect(Collectors.toList());
+    public List<String> uniqueTypeElements() {
+        return elements.stream().map(Element::getType).distinct().toList();
     }
-
-//    public List<Number> getNumberElements() {
-//        return elements.stream()
-//                .filter(element -> element.getType().equals("integer") || element.getType().equals("float"))
-//                .map(element -> element.getElement())  // Получаем Object
-//                .filter(obj -> obj instanceof Number)  // Фильтруем только Number (Integer или Float), игнорируем String
-//                .map(obj -> (Number) obj)  // Безопасное приведение
-//                .collect(Collectors.toList());
-//    }
-
-    public Statistics getStatistics() {
-        return statistics;
-    }
-
-
 }

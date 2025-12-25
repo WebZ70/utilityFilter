@@ -5,7 +5,7 @@ import service.parsing.recognize.Recognize;
 import java.util.Objects;
 import java.util.Optional;
 
-public class Element<T> {
+public class Element {
     private final Object element;
     private final String type;
 

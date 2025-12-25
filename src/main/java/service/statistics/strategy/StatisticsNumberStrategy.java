@@ -17,7 +17,7 @@ public class StatisticsNumberStrategy implements ICalcStatistics {
     @Override
     public void calcStatistics() {
         if (elements.isEmpty()) {
-            System.out.println("No elements to calculate statistics.");
+            System.out.println("Данные не найдены");
             return;
         }
 
@@ -27,7 +27,7 @@ public class StatisticsNumberStrategy implements ICalcStatistics {
         double avg = sum / elements.size();
 
         System.out.println("------------------------");
-        System.out.println("Полная статистика чисел:");
+        System.out.println("Полная статистика о записанных данных тип - числа:");
         System.out.println("------------------------");
         System.out.println("Sum: " + sum);
         System.out.println("Min: " + (min.isPresent() ? min.getAsDouble() : "N/A"));

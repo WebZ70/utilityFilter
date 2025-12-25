@@ -1,24 +1,23 @@
 package app;
 
-import base.Element;
 import base.Elements;
+import service.statistics.TypeStatistics;
 
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
+        //Выделение памяти под объект
+        Elements elements = new Elements();
         //Параметры по умолчанию
         String pref = "";
         String pathOut = "";
         StandardOpenOption option = StandardOpenOption.CREATE;
-        //Выделение памяти под объект
-        Elements elements = new Elements();
         System.out.println("Выполнение с параметрами: " + Arrays.stream(args).toList());
 
         if (args.length != 0 && Arrays.stream(args).noneMatch(s -> s.endsWith(".txt"))) {
-            System.out.println("Входные файлы не заданы");
+            System.out.println("Входные файлы не найдены");
             System.exit(0);
         }
 
@@ -29,7 +28,6 @@ public class Main {
                     case "-p":
                         if (!args[i+1].startsWith("-")) {
                             pref = args[++i];
-                            System.out.println("Префикс выходных файлов: " + pref);
                             break;
                         }
                         System.out.println("Пустое значение параметра '-p'");
@@ -37,7 +35,6 @@ public class Main {
                     case "-o":
                         if (!args[i+1].startsWith("-")) {
                             pathOut = args[++i];
-                            System.out.println("Путь до выходных файлов: " + pathOut);
                             break;
                         }
                         System.out.println("Пустое значение параметра '-o'");
@@ -47,10 +44,20 @@ public class Main {
                         System.out.println("Режим добавления в существующий файл(по умолчанию перезаписывает)");
                         break;
                     case "-s":
-                        System.out.println("Краткая статистика");
+                        if (elements.getStatistics().getTypeStatistics().equals(TypeStatistics.NONE)) {
+                            elements.getStatistics().setTypeStatistics(TypeStatistics.SUMMARY);
+                        } else {
+                            System.out.println("Нужно выбрать только один тип статистики (-f или -s)");
+                            System.exit(-1);
+                        }
                         break;
                     case "-f":
-                        System.out.println("Полная статистика");
+                        if (elements.getStatistics().getTypeStatistics().equals(TypeStatistics.NONE)) {
+                            elements.getStatistics().setTypeStatistics(TypeStatistics.FULL);
+                        } else {
+                            System.out.println("Нужно выбрать только один тип статистики (-f или -s)");
+                            System.exit(-1);
+                        }
                         break;
                     default:
                         if(args[i].endsWith(".txt")) {
@@ -62,18 +69,8 @@ public class Main {
             }
         }
 
-        elements.writeToFile(pathOut, option);
-        elements.getStatistics().collectorAll();
-
-
-
-//        elements.filterElementsByTypeObject("integer").stream()
-//                .map(elements::getElementsFilteredByObject)
-//                .map(element -> element.stream()
-//                        .map(Element::getElementObject)
-//                ).forEach(System.out::println);
-
-
+        elements.writeToFile(pathOut.concat(pref), option);
+        elements.getStatistics().show();
 
     }
 }

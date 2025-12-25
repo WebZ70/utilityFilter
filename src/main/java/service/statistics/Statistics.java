@@ -13,42 +13,56 @@ import base.Elements;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Statistics {
     private final HashMap<String, Integer> countElements;
-    Elements elements;
     AllStatistics allStatistics;
+    TypeStatistics typeStatistics;
+    Elements elements;
+
     public Statistics(Elements elements) {
         countElements = new HashMap<>();
+        allStatistics = new AllStatistics(null);
+        typeStatistics = TypeStatistics.NONE;
         this.elements = elements;
     }
 
-    public void showSummaryStatistics() {
-        System.out.println(countElements);
+    public TypeStatistics getTypeStatistics() {
+        return typeStatistics;
     }
 
-    public void showAllStatistics() {
-        allStatistics.calcStatistics();
+    public void setTypeStatistics(TypeStatistics typeStatistics) {
+        this.typeStatistics = typeStatistics;
     }
 
-    private void setCountElementsIn(String type, Integer count) {
-        this.countElements.put(type, count);
-    }
-
-    private void incrementCountElementsIn(String type, int count) {
-        if (countElements.containsKey(type)) {
-            countElements.replace(type, countElements.get(type), countElements.get(type) + count);
-        }else {
-            setCountElementsIn(type, count);
+    public void show() {
+        //Запись полной статистики
+        switch (this.typeStatistics) {
+            case FULL: showFullStatistics(); break;
+            case SUMMARY: showSummaryStatistics(); break;
         }
     }
 
-    private void collector() {
-        //Запись краткой статистики
-        elements.uniqueTypeElements().forEach(type -> {
-            incrementCountElementsIn(type, this.elements.getElements().stream().filter(f -> f.getType().equals(type)).map(Element::getElement).toList().size());
-        });
+    public void counter(String type, int count) {
+        if (!typeStatistics.equals(TypeStatistics.NONE)){
+            if (countElements.containsKey(type)) {
+                countElements.replace(type, countElements.get(type), countElements.get(type) + count);
+            }else {
+                this.countElements.put(type, count);
+            }
+        }
+    }
+
+    public void showSummaryStatistics() {
+        allStatistics.summaryStatistics(countElements);
+    }
+
+    public void showFullStatistics() {
+        allStatistics.summaryStatistics(countElements);
+        allStatistics = new StatisticsNumber(getElementsNumber());
+        allStatistics.fullStatistics();
+        allStatistics = new StatisticsString(getElementsString());
+        allStatistics.fullStatistics();
     }
 
     public List<Number> getElementsNumber() {
@@ -61,14 +75,5 @@ public class Statistics {
         return elements.getElements().stream().map(Element::getElementObject).toList()
                 .stream().filter(element -> element instanceof String)
                 .map(element -> (String) element).toList();
-    }
-
-    public void collectorAll() {
-        //Запись полной статистики
-        allStatistics = new StatisticsNumber(getElementsNumber());
-        allStatistics.calcStatistics();
-        allStatistics = new StatisticsString(getElementsString());
-        allStatistics.calcStatistics();
-
     }
 }

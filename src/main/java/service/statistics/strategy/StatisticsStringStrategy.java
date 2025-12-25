@@ -13,11 +13,12 @@ public class StatisticsStringStrategy implements ICalcStatistics {
     @Override
     public void calcStatistics() {
         if (elements.isEmpty()) {
-            System.out.println("No elements to calculate statistics.");
+            System.out.println("Данные не найдены");
             return;
         }
+
         System.out.println("------------------------");
-        System.out.println("Полная статистика строк:");
+        System.out.println("Полная статистика о записанных данных тип - строки:");
         System.out.println("------------------------");
         elements.stream().min(Comparator.comparingInt(String::length))
                 .ifPresent(s -> System.out.println("Самая короткая строка: " + s + "\nДлинна строки: " + s.length()));

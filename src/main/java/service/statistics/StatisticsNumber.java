@@ -3,6 +3,7 @@ package service.statistics;
 import base.Element;
 import service.statistics.strategy.StatisticsNumberStrategy;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class StatisticsNumber extends AllStatistics {
